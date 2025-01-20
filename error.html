@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ffcc00;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 40px 20px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 100px;
+            margin: 0;
+            color: #e74c3c;
+            text-shadow: 3px 3px 0 #ffcc00, 6px 6px 0 #e74c3c;
+            animation: bounce 2s infinite;
+        }
+
+        h2 {
+            font-size: 32px;
+            margin: 10px 0;
+            color: #333;
+            animation: shake 0.5s infinite;
+        }
+
+        p {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #555;
+        }
+
+        .emoji {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: spin 5s linear infinite;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5);
+        }
+
+            .button:hover {
+                background-color: #c0392b;
+                transform: scale(1.1);
+            }
+
+        .food-image {
+            width: 150px;
+            margin-top: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Background Food Elements */
+        .background-food {
+            position: absolute;
+            font-size: 40px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+            .background-food:nth-child(1) {
+                top: -50px;
+                left: 10%;
+                animation-delay: 0s;
+            }
+
+            .background-food:nth-child(2) {
+                top: 20%;
+                right: 5%;
+                animation-delay: 2s;
+            }
+
+            .background-food:nth-child(3) {
+                bottom: -50px;
+                left: 30%;
+                animation-delay: 4s;
+            }
+
+            .background-food:nth-child(4) {
+                bottom: 10%;
+                right: 20%;
+                animation-delay: 6s;
+            }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Weird Selectors */
+        input[type="checkbox"] {
+            display: none;
+        }
+
+            input[type="checkbox"]:checked ~ .container {
+                transform: rotate(180deg);
+            }
+
+        .weird-label {
+            display: block;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+        }
+
+            .weird-label:hover {
+                color: #e74c3c;
+            }
+    </style>
+</head>
+<body>
+    <!-- Background Food Elements -->
+    <div class="background-food">🍕</div>
+    <div class="background-food">🍔</div>
+    <div class="background-food">🍟</div>
+    <div class="background-food">🌮</div>
+
+    <!-- Container -->
+    <div class="container">
+        <h1>404</h1>
+        <h2>Oops! Page Not Found</h2>
+        <p>Looks like you took a wrong turn at the kitchen. The page you're looking for is missing, just like that last slice of pizza!</p>
+        <div class="emoji">🍕🍔🍟</div>
+    </div>
+</body>
+</html>
