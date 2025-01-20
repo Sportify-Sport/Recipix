@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Recipe API Call</title>
+</head>
+<body>
+    <h1>Delete Recipe</h1>
+    <button id="deleteRecipeBtn">Delete Recipe</button>
+
+    <script>
+        document.getElementById('deleteRecipeBtn').addEventListener('click', () => {
+            // Define the API endpoint
+            const apiUrl = 'https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/deleteRecipe';
+
+            // Data to send in the body of the DELETE request
+            const requestBody = JSON.stringify({
+                "body": "{\"RecipeId\": \"49457a47-93da-4931-ab32-8e982a628496\"}"
+            });
+
+            // Call the API using fetch with DELETE method
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Origin': window.location.origin,
+                },
+                body: requestBody, // Passing the stringified body
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json(); // Parse JSON data
+                })
+                .then(data => {
+                    console.log('API Response:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>
