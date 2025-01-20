@@ -270,7 +270,7 @@
 
         // Fetch the current user profile
         const fetchUser = async () => {
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/getUserProfile', {
+            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/getUserProfile', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -353,7 +353,7 @@
 
         // Fetch all recipes
         const fetchRecipes = async () => {
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/getAllRecipes');
+            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/fetchRecipes');
             const data = await response.json();
             allRecipes = JSON.parse(data.body).recipes;
             handleSort(allRecipes, 'Newest');
@@ -363,8 +363,8 @@
         const handleSave = async (recipeId, button) => {
             const isSaved = user.SavedRecipes?.includes(recipeId);
             const apiUrl = isSaved
-                ? 'https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/UnsaveRecipe'
-                : 'https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/saveRecipe';
+                ? 'https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/unSaveRecipe'
+                : 'https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/saveRecipe';
 
             const method = isSaved ? 'PUT' : 'POST';
 
@@ -413,7 +413,7 @@
                 return;
             }
 
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/searchRecipes', {
+            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/searchRecipes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -430,7 +430,7 @@
             const reviewsDiv = document.createElement('div');
             reviewsDiv.classList.add('reviews-list');
 
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/getReviews', {
+            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/getReviews', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +489,7 @@
             const rating = parseFloat(reviewRatingInput.value);
             const imageURL = reviewImageInput.value;
 
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/addReview', {
+            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/addReview', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
