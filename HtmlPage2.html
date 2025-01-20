@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Recipe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            align-content: center;
+            text-align: center;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #218838;
+            }
+    </style>
+</head>
+<body>
+    <h1>Post a Recipe</h1>
+    <form id="recipe-form">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="3" required></textarea>
+
+        <label for="ingredients">Ingredients (comma-separated):</label>
+        <textarea id="ingredients" name="ingredients" rows="3" required></textarea>
+
+        <label for="steps">Steps (comma-separated):</label>
+        <textarea id="steps" name="steps" rows="3" required></textarea>
+
+        <label for="category">Category:</label>
+        <select id="category" name="category" required>
+            <option value="">Select a category</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Main Course">Main Course</option>
+            <option value="Appetizer">Appetizer</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Beverage">Beverage</option>
+            <option value="Snack">Snack</option>
+        </select>
+
+        <label for="tags">Tags (comma-separated):</label>
+        <input type="text" id="tags" name="tags" required>
+
+        <label for="creatorUserId">Creator User ID:</label>
+        <input type="text" id="creatorUserId" name="creatorUserId" required>
+
+        <button type="submit">Post Recipe</button>
+    </form>
+
+    <script>
+        document.getElementById('recipe-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const ingredients = document.getElementById('ingredients').value.split(',').map(item => item.trim());
+            const steps = document.getElementById('steps').value.split(',').map(item => item.trim());
+            const category = document.getElementById('category').value; // Get selected category
+            const tags = document.getElementById('tags').value.split(',').map(item => item.trim());
+            const creatorUserId = document.getElementById('creatorUserId').value;
+
+            const recipe = {
+                Title: title,
+                Description: description,
+                Ingredients: ingredients,
+                Steps: steps,
+                Category: category,
+                Tags: tags,
+                CreatorUserId: creatorUserId
+            };
+
+            try {
+                const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/addRecipe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recipe)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                alert('Recipe posted successfully!');
+                console.log('Recipe posted:', result);
+            } catch (error) {
+                console.error('Error posting recipe:', error);
+                alert('Failed to post recipe. Check the console for details.');
+            }
+        });
+    </script>
+</body>
+</html>
