@@ -1,8 +1,8 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const loggedInUser = {
-        UserId: { S: "user-9012" },
+        UserId: { S: "user-5678" },
         CreatedAt: { S: "2025-01-12T10:00:00Z" },
-        CreatedRecipes: { L: [{ S: "5678-9012-3456" }] },
+        CreatedRecipes: { L: [{ S: "5590cbb6-611b-4e6c-a320-39353c049d00" }] },
         Email: { S: "bakersue@example.com" },
         Following: { L: [] },
         ProfilePictureURL: { S: "https://s3.amazonaws.com/bucket-name/profile3-picture.jpg" },
