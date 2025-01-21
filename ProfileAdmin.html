@@ -1,4 +1,4 @@
-﻿<!--<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,137 +8,6 @@
     <link href="ProfileAdmin.css" rel="stylesheet" />
 </head>
 <body>
-
-    <header>
-        <div class="logo">Recipix</div>
-        <nav>
-            <a href="RecipixMain.html">Home</a>
-            <a href="ProfileAdmin.html">Profile</a>
-        </nav>
-        <div class="profile">
-            <a href="login.html">Login</a>-->
-<!-- If logged in -->
-<!-- <img src="profile-pic.jpg" alt="Profile"> -->
-<!--</div>
-</header>
-
-<div class="profile-page">
-    <section class="profile-details">
-        <h2>Profile Details</h2>
-        <form>
-            <input type="text" placeholder="Username">
-            <input type="email" placeholder="Email">
-            <textarea placeholder="Bio"></textarea>
-            <button>Save Changes</button>
-        </form>
-    </section>
-
-    <section class="saved-recipes">
-        <h2>Saved Recipes</h2>
-        <div class="search-bar">
-            <input type="text" placeholder="Search for recipes...">
-            <select>
-                <option>Sort by Rating</option>
-                <option>Sort by Newest</option>
-                <option>Sort by Popularity</option>
-            </select>
-        </div>
-        <div class="recipes-container">
-            <div class="recipe-card">
-                <img src="recipe1.jpg" alt="Recipe 1">
-                <h3>Recipe Title</h3>
-                <p>Short description of the recipe...</p>
-                <button>Remove</button>
-            </div>
-            <div class="recipe-card">
-                <img src="recipe2.jpg" alt="Recipe 2">
-                <h3>Recipe Title</h3>
-                <p>Short description of the recipe...</p>
-                <button>Remove</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="uploaded-recipes">
-        <h2>Your Uploaded Recipes</h2>
-        <button class="add-recipe">Add Recipe</button>
-        <div class="recipes-container">
-            <div class="recipe-card">
-                <img src="recipe3.jpg" alt="Recipe 3">
-                <h3>Recipe Title</h3>
-                <p>Short description of the recipe...</p>
-                <button>Edit</button>
-                <button>Delete</button>
-            </div>
-            <div class="recipe-card">
-                <img src="recipe4.jpg" alt="Recipe 4">
-                <h3>Recipe Title</h3>
-                <p>Short description of the recipe...</p>
-                <button>Edit</button>
-                <button>Delete</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="admin-panel">
-        <h2>Admin Features</h2>
-        <div class="search-bar">
-            <input type="text" placeholder="Search for users or recipes...">
-            <select>
-                <option>Sort by Username</option>
-                <option>Sort by Activity</option>
-                <option>Sort by Rating</option>
-            </select>
-        </div>
-        <div class="admin-controls">
-            <div class="user-card">
-                <p><strong>Username:</strong> User123</p>
-                <p><strong>Email:</strong> user123@example.com</p>
-                <button>Edit</button>
-                <button>Delete</button>
-            </div>
-            <div class="recipe-card">
-                <img src="recipe5.jpg" alt="Recipe 5">
-                <h3>Recipe Title</h3>
-                <p>Short description of the recipe...</p>
-                <button>Edit</button>
-                <button>Delete</button>
-            </div>
-        </div>
-    </section>
-</div>-->
-<!-- Add Recipe Modal -->
-<!--<div class="modal" id="add-recipe-modal">
-        <div class="modal-content">
-            <h2>Add Recipe</h2>
-            <form>
-                <input type="text" placeholder="Recipe Title">
-                <textarea placeholder="Recipe Instructions"></textarea>
-                <input type="file" accept="image/*">
-                <button>Add Recipe</button>
-            </form>
-        </div>
-    </div>
-
-    <footer>
-        &copy; 2025 Recipix. All rights reserved.
-    </footer>
-
-</body>
-</html>-->
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipix - Profile/Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="ProfileAdmin.css" rel="stylesheet" />
-</head>
-<body>
-
     <header>
         <div class="logo">Recipix</div>
         <nav>
@@ -160,14 +29,22 @@
     <div class="profile-page">
         <section class="profile-details active-section">
             <h2>Profile Details</h2>
-            <form>
-                <input type="text" placeholder="Username">
-                <input type="email" placeholder="Email">
-                <textarea placeholder="Bio"></textarea>
-                <button>Save Changes</button>
+            <form id="profile-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Username" readonly>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Email" readonly>
+
+                <label for="created-at">Created At:</label>
+                <input type="text" id="created-at" placeholder="Created At" readonly>
+
+                <label for="bio">Bio:</label>
+                <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+
+                <button type="submit" id="save-changes-button" disabled>Save Changes</button>
             </form>
         </section>
-
         <section class="saved-recipes">
             <h2>Saved Recipes</h2>
             <div class="search-bar">
@@ -179,28 +56,19 @@
                 </select>
             </div>
             <div class="recipes-container">
-                <div class="recipe-card">
-                    <img src="recipe1.jpg" alt="Recipe 1">
-                    <h3>Recipe Title</h3>
-                    <p>Short description of the recipe...</p>
-                    <button>Remove</button>
-                </div>
+
             </div>
         </section>
+
 
         <section class="uploaded-recipes">
             <h2>Your Uploaded Recipes</h2>
             <button class="add-recipe">Add Recipe</button>
             <div class="recipes-container">
-                <div class="recipe-card">
-                    <img src="recipe3.jpg" alt="Recipe 3">
-                    <h3>Recipe Title</h3>
-                    <p>Short description of the recipe...</p>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </div>
+
             </div>
         </section>
+
 
         <section class="admin-panel">
             <h2>Admin Features</h2>
@@ -213,12 +81,7 @@
                 </select>
             </div>
             <div class="admin-controls">
-                <div class="user-card">
-                    <p><strong>Username:</strong> User123</p>
-                    <p><strong>Email:</strong> user123@example.com</p>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </div>
+
             </div>
         </section>
     </div>
@@ -226,9 +89,6 @@
     <footer>
         &copy; 2025 Recipix. All rights reserved.
     </footer>
-
     <script src="ProfileAdmin.js"></script>
-
 </body>
 </html>
-
