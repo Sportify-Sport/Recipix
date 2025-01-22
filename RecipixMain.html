@@ -1,214 +1,4 @@
-﻿<!--<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="RecipixMain.css" rel="stylesheet" />
-</head>
-<body>
-    <header>
-        <div class="logo">Recipix</div>
-        <nav>
-            <a href="RecipixMain.html">Home</a>
-            <a href="ProfileAdmin.html">Profile</a>
-        </nav>
-        <div class="profile">
-            <a href="login.html">Login</a>
-        </div>
-    </header>
-
-    <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search for recipes...">
-        <select id="sort-select">
-            <option value="Newest">Sort by Newest</option>
-            <option value="Rating">Sort by Rating</option>
-        </select>
-    </div>
-
-    <div class="recipes-container" id="recipes-container">-->
-<!-- Recipe cards will be dynamically injected here -->
-<!--</div>
-
-    <footer>
-        &copy; 2025 Recipix. All rights reserved.
-    </footer>
-
-    <script>
-        const recipesContainer = document.getElementById('recipes-container');
-        const searchInput = document.getElementById('search-input');
-        const sortSelect = document.getElementById('sort-select');
-        let user = null; // Stores the current user data
-        let allRecipes = []; // Stores all fetched recipes
-
-        // Fetch the current user profile
-        const fetchUser = async () => {
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/getUserProfile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ body: JSON.stringify({ UserId: 'user-5678' }) }),
-            });
-
-            const data = await response.json();
-            // Parse the body string into an object
-            user = JSON.parse(data.body);
-            console.log(user);
-        };
-
-        // Render recipes
-        const renderRecipes = (recipes) => {
-            recipesContainer.innerHTML = ''; // Clear the container
-            recipes.forEach(recipe => {
-                const isSaved = user.SavedRecipes?.includes(recipe.RecipeId);
-                const recipeCard = document.createElement('div');
-                recipeCard.classList.add('recipe-card');
-
-                // Add user info
-                recipeCard.innerHTML += `
-                    <div class="user-info">
-                        <span class="username">${recipe.CreatorUsername}</span>
-                        <span class="create-date">${new Date(recipe.CreatedAt).toLocaleDateString()}</span>
-                    </div>
-                    <h3 class="title">${recipe.Title}</h3>
-                    <p class="description">${recipe.Description}</p>
-                    <p class="category">Category: ${recipe.Category}</p>
-                    <img src="${recipe.ImageURL || 'default-image.jpg'}" alt="${recipe.Title}">
-                    <p class="rating">Rating: ${recipe.Rating}</p>
-                `;
-
-                // Add ingredients and steps
-                const ingredientsText = document.createElement('p');
-                ingredientsText.classList.add('expand-text');
-                ingredientsText.textContent = 'Ingredients';
-                ingredientsText.addEventListener('click', () => {
-                    ingredientsList.style.display = ingredientsList.style.display === 'none' ? 'block' : 'none';
-                });
-
-                const ingredientsList = document.createElement('div');
-                ingredientsList.classList.add('ingredients');
-                ingredientsList.innerHTML = `<ul>${recipe.Ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>`;
-                ingredientsList.style.display = 'none';
-
-                const stepsText = document.createElement('p');
-                stepsText.classList.add('expand-text');
-                stepsText.textContent = 'Steps';
-                stepsText.addEventListener('click', () => {
-                    stepsList.style.display = stepsList.style.display === 'none' ? 'block' : 'none';
-                });
-
-                const stepsList = document.createElement('div');
-                stepsList.classList.add('steps');
-                stepsList.innerHTML = `<ol>${recipe.Steps.map(step => `<li>${step}</li>`).join('')}</ol>`;
-                stepsList.style.display = 'none';
-
-                recipeCard.appendChild(ingredientsText);
-                recipeCard.appendChild(ingredientsList);
-                recipeCard.appendChild(stepsText);
-                recipeCard.appendChild(stepsList);
-
-                // Add Save/Unsave button
-                const saveButton = document.createElement('button');
-                saveButton.textContent = isSaved ? 'Unsave' : 'Save';
-                saveButton.addEventListener('click', () => handleSave(recipe.RecipeId, saveButton));
-                recipeCard.appendChild(saveButton);
-
-                recipesContainer.appendChild(recipeCard);
-            });
-        };
-
-        // Fetch all recipes
-        const fetchRecipes = async () => {
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/getAllRecipes');
-            const data = await response.json();
-            allRecipes = JSON.parse(data.body).recipes;
-            handleSort(allRecipes, 'Newest');
-        };
-
-        // Save or Unsave a recipe
-        const handleSave = async (recipeId, button) => {
-            const isSaved = user.SavedRecipes?.includes(recipeId);
-            const apiUrl = isSaved
-                ? 'https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/UnsaveRecipe'
-                : 'https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/saveRecipe';
-
-            const method = isSaved ? 'PUT' : 'POST';
-
-            const response = await fetch(apiUrl, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    body: JSON.stringify({ UserId: user.UserId, RecipeId: recipeId }),
-                }),
-            });
-
-            if (response.ok) {
-                if (isSaved) {
-                    user.SavedRecipes = user.SavedRecipes.filter(id => id !== recipeId);
-                    button.textContent = 'Save';
-                    alert('Recipe removed from saved list!');
-                } else {
-                    user.SavedRecipes = [...(user.SavedRecipes || []), recipeId];
-                    button.textContent = 'Unsave';
-                    alert('Recipe added to saved list!');
-                }
-            } else {
-                console.error('Error saving/unsaving the recipe');
-                alert('An error occurred. Please try again.');
-            }
-        };
-
-        // Handle sorting
-        const handleSort = (recipes, sortBy) => {
-            let sortedRecipes = [...recipes];
-            if (sortBy === 'Newest') {
-                sortedRecipes.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
-            } else if (sortBy === 'Rating') {
-                sortedRecipes.sort((a, b) => b.Rating - a.Rating);
-            }
-            renderRecipes(sortedRecipes);
-        };
-
-        // Handle search
-        const handleSearch = async () => {
-            const keyword = searchInput.value.trim();
-            if (!keyword) {
-                handleSort(allRecipes, sortSelect.value);
-                return;
-            }
-
-            const response = await fetch('https://ty6ieut9fc.execute-api.us-east-1.amazonaws.com/prod/searchRecipes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ body: JSON.stringify({ Keyword: keyword }) }),
-            });
-            const data = await response.json();
-            const searchResults = JSON.parse(data.body).recipes;
-            renderRecipes(searchResults);
-        };
-
-        // Initialize page
-        const init = async () => {
-            await fetchUser();
-            await fetchRecipes();
-            sortSelect.addEventListener('change', () => handleSort(allRecipes, sortSelect.value));
-            searchInput.addEventListener('input', handleSearch);
-        };
-
-        init();
-    </script>
-
-</body>
-</html>-->
-
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -246,15 +36,19 @@
     </footer>
 
     <!-- Review Modal -->
-    <div id="review-modal" style="display:none;">
-        <form id="review-form">
-            <textarea id="review-description" placeholder="Write your review..."></textarea>
-            <input type="number" id="review-rating" placeholder="Rating (1-5)" min="1" max="5" />
-            <input type="text" id="review-image" placeholder="Image URL (optional)" />
-            <button type="submit">Submit Review</button>
-        </form>
-        <button onclick="closeReviewModal()">Close</button>
+    <div id="review-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReviewModal()">×</button>
+            <h2>Add Review</h2>
+            <form id="review-form">
+                <textarea id="review-description" placeholder="Write your review" required></textarea>
+                <input id="review-rating" type="number" step="0.1" min="0" max="5" placeholder="Rating (0-5)" required />
+                <input id="review-image" type="text" placeholder="Image URL (optional)" />
+                <button type="submit">Submit</button>
+            </form>
+        </div>
     </div>
+
 
     <script>
         const recipesContainer = document.getElementById('recipes-container');
@@ -294,16 +88,16 @@
 
                 // Add user info
                 recipeCard.innerHTML += `
-                        <div class="user-info">
-                            <span class="username">${recipe.CreatorUsername}</span>
-                            <span class="create-date">${new Date(recipe.CreatedAt).toLocaleDateString()}</span>
-                        </div>
-                        <h3 class="title">${recipe.Title}</h3>
-                        <p class="description">${recipe.Description}</p>
-                        <p class="category">Category: ${recipe.Category}</p>
-                        <img src="${recipe.ImageURL || 'default-image.jpg'}" alt="${recipe.Title}">
-                        <p class="rating">Rating: ${recipe.Rating}</p>
-                    `;
+                            <div class="user-info">
+                                <span class="username">${recipe.CreatorUsername}</span>
+                                <span class="create-date">${new Date(recipe.CreatedAt).toLocaleDateString()}</span>
+                            </div>
+                            <h3 class="title">${recipe.Title}</h3>
+                            <p class="description">${recipe.Description}</p>
+                            <p class="category">Category: ${recipe.Category}</p>
+                            <img src="${recipe.ImageURL || 'default-image.jpg'}" alt="${recipe.Title}">
+                            <p class="rating">Rating: ${recipe.Rating}</p>
+                        `;
 
                 // Add ingredients and steps
                 const ingredientsText = document.createElement('p');
@@ -344,7 +138,7 @@
                 // Reviews Button
                 const reviewsButton = document.createElement('button');
                 reviewsButton.textContent = 'Reviews';
-                reviewsButton.addEventListener('click', () => handleReviews(recipe.RecipeId, recipeCard));
+                reviewsButton.addEventListener('click', () => handleReviews(recipe.RecipeId, recipeCard, reviewsButton));
                 recipeCard.appendChild(reviewsButton);
 
                 recipesContainer.appendChild(recipeCard);
@@ -426,98 +220,203 @@
         };
 
         // Handle reviews
-        const handleReviews = async (recipeId, recipeCard) => {
-            const reviewsDiv = document.createElement('div');
-            reviewsDiv.classList.add('reviews-list');
+        const handleReviews = async (recipeId, recipeCard, button) => {
+            let reviewsDiv = recipeCard.querySelector('.reviews-list');
 
-            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/getReviews', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    body: JSON.stringify({ RecipeId: recipeId }),
-                }),
-            });
+            // If the button text is 'Reviews', we need to fetch the reviews again
+            if (button.textContent === 'Reviews') {
+                try {
+                    const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/getReviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            body: JSON.stringify({ RecipeId: recipeId }),
+                        }),
+                    });
 
-            const data = await response.json();
+                    const data = await response.json();
 
-            // Ensure that 'body' contains a stringified JSON object
-            if (data.body) {
-                const reviews = JSON.parse(data.body).Reviews;
-                console.log(reviews);  // Now you have the list of reviews with Usernames
-            } else {
-                console.log("No reviews found or an error occurred.");
+                    const reviews = data.body ? JSON.parse(data.body).Reviews : undefined;
+
+                    if (reviews && reviews.length > 0) {
+                        reviews.sort((a, b) => {
+                            return new Date(b.CreatedAt) - new Date(a.CreatedAt);
+                        });
+                    }
+
+                    if (!reviewsDiv) {
+                        reviewsDiv = document.createElement('div');
+                        reviewsDiv.classList.add('reviews-list');
+                        recipeCard.appendChild(reviewsDiv);
+                    }
+
+                    reviewsDiv.innerHTML = '';
+
+                    const addReviewButton = document.createElement('button');
+                    addReviewButton.textContent = 'Add Review';
+                    addReviewButton.addEventListener('click', () => {
+                        reviewsDiv.style.display = 'none';
+                        button.textContent = 'Reviews';
+                        openReviewModal(recipeId);
+                    });
+                    reviewsDiv.appendChild(addReviewButton);
+
+                    if (!reviews || reviews.length === 0) {
+                        const noReviewsMessage = document.createElement('p');
+                        noReviewsMessage.textContent = 'There are no reviews for this recipe.';
+                        reviewsDiv.appendChild(noReviewsMessage);
+                    } else {
+                        reviews.forEach(review => {
+                            const reviewCard = document.createElement('div');
+                            reviewCard.classList.add('review-card');
+
+                            // Check if the current user is the one who wrote the review
+                            const isCurrentUser = review.Username === user.Username;
+
+                            // Add the "You" label next to the username if it's the current user
+                            let usernameHTML = `<span class="username">${review.Username}</span>`;
+                            if (isCurrentUser) {
+                                usernameHTML = 'You';
+                            }
+
+                            // Create the review card
+                            reviewCard.innerHTML = `
+        <p>____________________________________________________________________________________________________</p>
+        <br>
+        <div class="user-info">
+            ${usernameHTML}
+            <span class="create-date">${new Date(review.CreatedAt).toLocaleDateString()}</span>
+        </div>
+        <p class="description">${review.Description}</p>
+        <p class="rating">Rating: ${review.Rating}</p>
+        <img src="${review.ImageURL || 'default-image.jpg'}" alt="${review.Username}'s review">
+    `;
+
+                            // If the current user is the reviewer, show a delete button
+                            if (isCurrentUser) {
+                                const deleteButton = document.createElement('button');
+                                deleteButton.classList.add('deleteReview');
+                                deleteButton.textContent = 'Delete Review';
+
+                                // Handle the delete button click
+                                deleteButton.addEventListener('click', async () => {
+                                    const confirmDelete = confirm('Are you sure you want to delete this review?');
+                                    if (confirmDelete) {
+                                        try {
+                                            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/deleteReview', {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    body: JSON.stringify({
+                                                        ReviewId: review.ReviewId,
+                                                        ReviewerUserId: user.UserId,
+                                                    }),
+                                                }),
+                                            });
+
+                                            if (response.ok) {
+                                                alert('Review deleted successfully!');
+                                                // Update the reviews list by removing the review from the DOM
+                                                reviewCard.remove();
+                                            } else {
+                                                const data = await response.json();
+                                                alert(`Failed to delete review. Error: ${data.message}`);
+                                            }
+                                        } catch (error) {
+                                            console.error('Error deleting review:', error);
+                                            alert('An error occurred while deleting the review.');
+                                        }
+                                    }
+                                });
+                                // Append the delete button to the review card
+                                reviewCard.appendChild(deleteButton);
+                            }
+                            // Append the review card to the reviews div
+                            reviewsDiv.appendChild(reviewCard);
+                        });
+
+                    }
+
+                    reviewsDiv.style.display = 'block';
+                } catch (error) {
+                    console.error('Error fetching reviews:', error);
+                    const errorMessage = document.createElement('p');
+                    errorMessage.textContent = 'Unable to fetch reviews. Please try again later.';
+                    reviewsDiv.appendChild(errorMessage);
+                }
+
+                button.textContent = 'X';
+            } else if (button.textContent === 'X') {
+                const isVisible = reviewsDiv.style.display !== 'none';
+                reviewsDiv.style.display = isVisible ? 'none' : 'block';
+                button.textContent = isVisible ? 'Reviews' : 'X';
             }
-            // Display reviews
-            reviews.forEach(review => {
-                const reviewCard = document.createElement('div');
-                reviewCard.classList.add('review-card');
-                reviewCard.innerHTML = `
-                        <div class="user-info">
-                            <span class="username">${review.Username}</span>
-                            <span class="create-date">${new Date(review.CreatedAt).toLocaleDateString()}</span>
-                        </div>
-                        <p class="description">${review.Description}</p>
-                        <img src="${review.ImageURL || 'default-image.jpg'}" alt="${review.Username}'s review">
-                        <p class="rating">Rating: ${review.Rating}</p>
-                    `;
-                reviewsDiv.appendChild(reviewCard);
-            });
-
-            // Add "Add Review" Button
-            const addReviewButton = document.createElement('button');
-            addReviewButton.textContent = 'Add Review';
-            addReviewButton.addEventListener('click', () => openReviewModal(recipeId));
-            reviewsDiv.appendChild(addReviewButton);
-
-            recipeCard.appendChild(reviewsDiv);
         };
 
         // Open review modal
         const openReviewModal = (recipeId) => {
-            reviewModal.style.display = 'block';
-            reviewForm.onsubmit = (e) => {
-                e.preventDefault();
-                handleAddReview(recipeId);
-            };
-        };
-
-        // Handle adding a review
-        const handleAddReview = async (recipeId) => {
-            const description = reviewDescriptionInput.value;
-            const rating = parseFloat(reviewRatingInput.value);
-            const imageURL = reviewImageInput.value;
-
-            const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/addReview', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    body: JSON.stringify({
-                        RecipeId: recipeId,
-                        ReviewerUserId: user.UserId,
-                        Rating: rating,
-                        Description: description,
-                        ImageURL: imageURL,
-                    }),
-                }),
-            });
-
-            if (response.ok) {
-                alert('Review added successfully!');
-                reviewModal.style.display = 'none';
-                fetchRecipes(); // Refresh the recipe list to reflect the new review
-            } else {
-                alert('Error adding review');
-            }
+            reviewModal.dataset.recipeId = recipeId; // Attach recipeId to the modal
+            reviewModal.style.display = 'flex';
         };
 
         // Close review modal
         const closeReviewModal = () => {
             reviewModal.style.display = 'none';
+            reviewForm.reset();
         };
+
+        // Handle adding a review
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const recipeId = reviewModal.dataset.recipeId;
+            const description = reviewDescriptionInput.value.trim();
+            const rating = parseFloat(reviewRatingInput.value);
+            const imageURL = reviewImageInput.value.trim();
+
+            if (!description || rating < 0 || rating > 5 || isNaN(rating)) {
+                alert('Please fill out all required fields correctly.');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/addReview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        body: JSON.stringify({
+                            RecipeId: recipeId,
+                            ReviewerUserId: user.UserId,
+                            Rating: rating,
+                            Description: description,
+                            ImageURL: imageURL || '',
+                        }),
+                    }),
+                });
+
+                if (response.ok) {
+                    alert('Review added successfully!');
+                    closeReviewModal();
+                    // Find the reviewsDiv and hide it
+                    const recipeCard = document.querySelector(`[data-recipe-id="${recipeId}"]`);
+                    const reviewsDiv = recipeCard.querySelector('.reviews-list');
+                    if (reviewsDiv) {
+                        reviewsDiv.style.display = 'none'; // Close the div that contains the reviews
+                    }
+                } else {
+                    alert('Failed to add review. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error adding review:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        });
 
         // Initialize page
         const init = async () => {
