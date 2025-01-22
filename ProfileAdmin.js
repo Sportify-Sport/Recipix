@@ -1,8 +1,8 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const loggedInUser = {
-        UserId: { S: "user-5678" },
+        UserId: { S: "user-9012" },
         CreatedAt: { S: "2025-01-12T10:00:00Z" },
-        CreatedRecipes: { L: [{ S: "5590cbb6-611b-4e6c-a320-39353c049d00" }] },
+        CreatedRecipes: { L: [{ S: "4b3d0903-d22e-449f-9a78-50fe00c987f8" }] },
         Email: { S: "bakersue@example.com" },
         Following: { L: [] },
         ProfilePictureURL: { S: "https://s3.amazonaws.com/bucket-name/profile3-picture.jpg" },
@@ -13,7 +13,157 @@
         Bio: { S: "I love baking and sharing my recipes with the world!" }
     };
 
-    // Populate profile details
+
+    const modal = document.getElementById("recipe-modal");
+    const addRecipeButton = document.querySelector(".add-recipe");
+    const closeModalButton = document.querySelector(".close-modal");
+
+
+    addRecipeButton.addEventListener("click", () => {
+        modal.style.display = "flex"; 
+        document.getElementById("recipe-form").reset(); 
+        document.getElementById("recipe-form").dataset.mode = "add"; 
+    });
+
+
+    closeModalButton.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none"; 
+        }
+    });
+
+
+const populateModalWithRecipeDetails = (recipe) => {
+    console.log("Populating modal with recipe details:", recipe); 
+
+
+    document.getElementById("title").value = recipe.Title || "";
+    document.getElementById("description").value = recipe.Description || "";
+    document.getElementById("ingredients").value = recipe.Ingredients?.join(", ") || "";
+    document.getElementById("steps").value = recipe.Steps?.join(", ") || "";
+    document.getElementById("category").value = recipe.Category || "";
+    document.getElementById("tags").value = recipe.Tags?.join(", ") || "";
+    document.getElementById("creatorUserId").value = recipe.CreatorUserId || "";
+};
+
+ 
+const fetchRecipeDetails = async (recipeId) => {
+    console.log("Fetching recipe details for RecipeId:", recipeId); 
+    try {
+        const requestBody = {
+            body: JSON.stringify({ RecipeId: recipeId })
+        };
+        const response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/getRecipeDetails", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody), 
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("Fetched recipe details:", result); 
+
+
+        const recipe = JSON.parse(result.body);
+        console.log("Parsed recipe details:", recipe); 
+
+
+        populateModalWithRecipeDetails(recipe);
+
+
+        modal.style.display = "flex";
+
+
+        document.getElementById("recipe-form").dataset.mode = "edit";
+        document.getElementById("recipe-form").dataset.recipeId = recipeId;
+    } catch (error) {
+        console.error("Error fetching recipe details:", error);
+        alert("Failed to fetch recipe details. Check the console for details.");
+    }
+};
+
+    document.getElementById("recipe-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const ingredients = document.getElementById("ingredients").value.split(",").map(item => item.trim());
+        const steps = document.getElementById("steps").value.split(",").map(item => item.trim());
+        const category = document.getElementById("category").value;
+        const tags = document.getElementById("tags").value.split(",").map(item => item.trim());
+        const creatorUserId = document.getElementById("creatorUserId").value;
+
+
+        const recipe = {
+            Title: title,
+            Description: description,
+            Ingredients: ingredients,
+            Steps: steps,
+            Category: category,
+            Tags: tags,
+            CreatorUserId: creatorUserId
+        };
+
+        try {
+            const mode = document.getElementById("recipe-form").dataset.mode;
+            let response;
+
+            if (mode === "add") {
+
+                response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/AddRecipe", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(recipe)
+                });
+            } else if (mode === "edit") {
+
+                const recipeId = document.getElementById("recipe-form").dataset.recipeId;
+                recipe.RecipeId = recipeId; 
+                response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/updateRecipe", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(recipe)
+                });
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            alert(mode === "add" ? "Recipe posted successfully!" : "Recipe updated successfully!");
+            console.log(mode === "add" ? "Recipe posted:" : "Recipe updated:", result);
+
+
+            modal.style.display = "none";
+
+            document.getElementById("recipe-form").reset();
+
+
+            populateUploadedRecipes();
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Failed to ${mode === "add" ? "post" : "update"} recipe. Check the console for details.`);
+        }
+    });
+
+
+
     const populateProfileDetails = () => {
         const profileDetails = document.querySelector(".profile-details");
         if (profileDetails) {
@@ -25,7 +175,7 @@
         }
     };
 
-    // Populate saved recipes
+
     const populateSavedRecipes = () => {
         const savedRecipesContainer = document.querySelector(".saved-recipes .recipes-container");
         if (savedRecipesContainer) {
@@ -42,52 +192,32 @@
         }
     };
 
-    //// Populate uploaded recipes
-    //const populateUploadedRecipes = () => {
-    //    const uploadedRecipesContainer = document.querySelector(".uploaded-recipes .recipes-container");
-    //    if (uploadedRecipesContainer) {
-    //        uploadedRecipesContainer.innerHTML = loggedInUser.CreatedRecipes.L
-    //            .map(recipe => `
-    //                <div class="recipe-card">
-    //                    <img src="https://via.placeholder.com/150" alt="Recipe">
-    //                    <h3>Recipe ID: ${recipe.S}</h3>
-    //                    <p>This is an uploaded recipe.</p>
-    //                    <button>Edit</button>
-    //                    <button>Delete</button>
-    //                </div>
-    //            `)
-    //            .join("");
-    //    }
-    //};
 
-
-
-    // Populate uploaded recipes
     const populateUploadedRecipes = () => {
         const uploadedRecipesContainer = document.querySelector(".uploaded-recipes .recipes-container");
         if (uploadedRecipesContainer) {
             uploadedRecipesContainer.innerHTML = loggedInUser.CreatedRecipes.L
                 .map(recipe => `
-                <div class="recipe-card">
-                    <img src="https://via.placeholder.com/150" alt="Recipe">
-                    <h3>Recipe ID: ${recipe.S}</h3>
-                    <p>This is an uploaded recipe.</p>
-                    <button class="edit-recipe" data-recipe-id="${recipe.S}">Edit</button>
-                    <button class="delete-recipe" data-recipe-id="${recipe.S}">Delete</button>
-                </div>
-            `)
+                    <div class="recipe-card">
+                        <img src="https://via.placeholder.com/150" alt="Recipe">
+                        <h3>Recipe ID: ${recipe.S}</h3>
+                        <p>This is an uploaded recipe.</p>
+                        <button class="edit-recipe" data-recipe-id="${recipe.S}">Edit</button>
+                        <button class="delete-recipe" data-recipe-id="${recipe.S}">Delete</button>
+                    </div>
+                `)
                 .join("");
 
-            // Add event listeners for Edit buttons
+
             const editButtons = document.querySelectorAll(".edit-recipe");
             editButtons.forEach(button => {
                 button.addEventListener("click", () => {
                     const recipeId = button.getAttribute("data-recipe-id");
-                    editRecipe(recipeId);
+                    fetchRecipeDetails(recipeId); 
                 });
             });
 
-            // Add event listeners for Delete buttons
+
             const deleteButtons = document.querySelectorAll(".delete-recipe");
             deleteButtons.forEach(button => {
                 button.addEventListener("click", () => {
@@ -98,62 +228,19 @@
         }
     };
 
-    // Function to handle editing a recipe
-    const editRecipe = async (recipeId) => {
-        try {
-            // Fetch the recipe details (you can replace this with your logic to get the recipe data)
-            const recipeDetails = {
-                RecipeId: recipeId,
-                Title: "Updated Homos Homos",
-                Description: "Fluffy and delicious vanilla cupcakes with extra frosting.",
-                Ingredients: ["Flour", "Sugar", "Vanilla Extract", "Butter", "Eggs", "Frosting"],
-                Steps: [
-                    "Mix dry ingredients",
-                    "Add wet ingredients",
-                    "Bake at 350°F for 20 mins",
-                    "Frost the cupcakes"
-                ],
-                Category: "Dessert",
-                Tags: ["cupcakes", "vanilla", "frosting"]
-            };
 
-            // Send PUT request to update the recipe
-            const response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/updateRecipe", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(recipeDetails)
-            });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
 
-            const result = await response.json();
-            alert("Recipe updated successfully!");
-            console.log("Recipe updated:", result);
-
-            // Refresh the uploaded recipes list
-            populateUploadedRecipes();
-        } catch (error) {
-            console.error("Error updating recipe:", error);
-            alert("Failed to update recipe. Check the console for details.");
-        }
-    };
-
-    // Function to handle deleting a recipe
     const deleteRecipe = async (recipeId) => {
         try {
-            // Send DELETE request to delete the recipe
-            const response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/deleteRecipe", {
+            const response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/DeleteRecipe", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    RecipeId: recipeId,
-                    CreatorUserId: loggedInUser.UserId.S // Use the logged-in user's ID
+                    RecipeId: { S: recipeId },
+                    CreatorUserId: { S: loggedInUser.UserId.S }
                 })
             });
 
@@ -165,7 +252,7 @@
             alert("Recipe deleted successfully!");
             console.log("Recipe deleted:", result);
 
-            // Refresh the uploaded recipes list
+
             populateUploadedRecipes();
         } catch (error) {
             console.error("Error deleting recipe:", error);
@@ -174,19 +261,6 @@
     };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    // Show/hide sections
     const buttons = document.querySelectorAll(".toggle-button");
     const sections = document.querySelectorAll(".profile-page section");
 
@@ -206,10 +280,10 @@
         });
     });
 
-    // Show profile details by default
+
     showSection("profile-details");
 
-    // Handle bio updates
+
     const bioTextarea = document.querySelector("#bio");
     const saveChangesButton = document.querySelector("#save-changes-button");
 
@@ -239,8 +313,8 @@
 
             const payload = {
                 body: JSON.stringify({
-                    UserId: "user-9012",
-                    Bio: newBio
+                    UserId: { S: "user-9012" },
+                    Bio: { S: newBio }
                 })
             };
 
@@ -273,84 +347,7 @@
         }
     });
 
-    // Modal functionality for adding recipes
-    const addRecipeButton = document.querySelector(".add-recipe");
-    const modal = document.getElementById("recipe-modal");
-    const closeModalButton = document.querySelector(".close-modal");
 
-    if (addRecipeButton && modal) {
-        // Open modal when "Add Recipe" button is clicked
-        addRecipeButton.addEventListener("click", () => {
-            modal.style.display = "flex"; // Show the modal
-        });
-
-        // Close modal when the close button (X) is clicked
-        closeModalButton.addEventListener("click", () => {
-            modal.style.display = "none"; // Hide the modal
-        });
-
-        // Close modal when clicking outside the modal
-        window.addEventListener("click", (event) => {
-            if (event.target === modal) {
-                modal.style.display = "none"; // Hide the modal
-            }
-        });
-
-        // Handle form submission
-        document.getElementById("recipe-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            // Get form values
-            const title = document.getElementById("title").value;
-            const description = document.getElementById("description").value;
-            const ingredients = document.getElementById("ingredients").value.split(",").map(item => item.trim());
-            const steps = document.getElementById("steps").value.split(",").map(item => item.trim());
-            const category = document.getElementById("category").value;
-            const tags = document.getElementById("tags").value.split(",").map(item => item.trim());
-            const creatorUserId = document.getElementById("creatorUserId").value;
-
-            // Create recipe object
-            const recipe = {
-                Title: title,
-                Description: description,
-                Ingredients: ingredients,
-                Steps: steps,
-                Category: category,
-                Tags: tags,
-                CreatorUserId: creatorUserId
-            };
-
-            try {
-                // Send POST request to the API
-                const response = await fetch("https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/AddRecipe", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(recipe)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                alert("Recipe posted successfully!");
-                console.log("Recipe posted:", result);
-
-                // Close the modal after successful submission
-                modal.style.display = "none";
-
-                // Clear the form
-                document.getElementById("recipe-form").reset();
-            } catch (error) {
-                console.error("Error posting recipe:", error);
-                alert("Failed to post recipe. Check the console for details.");
-            }
-        });
-    }
-
-    // Populate all sections
     populateProfileDetails();
     populateSavedRecipes();
     populateUploadedRecipes();
