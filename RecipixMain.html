@@ -19,6 +19,12 @@
         </div>
     </header>
 
+    <div id="sticky-buttons">
+        <button id="all-recipes-button">All Recipes</button>
+        <h1>|</h1>
+        <button id="following-button">Following</button>
+    </div>
+
     <div class="search-bar">
         <input type="text" id="search-input" placeholder="Search for recipes...">
         <select id="sort-select">
@@ -59,6 +65,9 @@
         const reviewDescriptionInput = document.getElementById('review-description');
         const reviewRatingInput = document.getElementById('review-rating');
         const reviewImageInput = document.getElementById('review-image');
+        const stickyButtons = document.getElementById('sticky-buttons');
+        const allRecipesButton = document.getElementById('all-recipes-button');
+        const followingButton = document.getElementById('following-button');
         let user = null; // Stores the current user data
         let allRecipes = []; // Stores all fetched recipes
 
@@ -78,56 +87,156 @@
             console.log(user);
         };
 
+        allRecipesButton.addEventListener('click', () => {
+            fetchRecipes(); 
+        });
+
+        // Event listener for "Following" button
+        followingButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/generateFeed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ UserId: user.UserId }),
+                });
+
+                const result = await response.json();
+
+                if (result.statusCode === 200) {
+                    const parsedBody = JSON.parse(result.body);
+                    if (parsedBody.Feed.length === 0) {
+                        recipesContainer.innerHTML = '<p style="text-align: center; font-size: 18px;">No recipes uploaded by following users.</p>';
+                    } else {
+                        renderRecipes(parsedBody.Feed); // Render the recipes from the feed
+                    }
+                } else {
+                    alert('Failed to fetch following recipes. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching following recipes:', error);
+                alert('Unable to fetch following recipes. Please try again later.');
+            }
+        });
+
         // Render recipes
         const renderRecipes = (recipes) => {
             recipesContainer.innerHTML = ''; // Clear the container
+
+            const allFollowing = new Set(user.Following || []); // Convert user.Following to a Set for quick lookup
+
             recipes.forEach(recipe => {
                 const isSaved = user.SavedRecipes?.includes(recipe.RecipeId);
                 const recipeCard = document.createElement('div');
                 recipeCard.classList.add('recipe-card');
 
+                // Determine username display
+                const isCurrentUser = recipe.CreatorUsername === user.Username;
+                let usernameHTML = isCurrentUser
+                    ? '<span class="username">You</span>'
+                    : `<span class="username">${recipe.CreatorUsername}</span>`;
+
                 // Add user info
                 recipeCard.innerHTML += `
-                            <div class="user-info">
-                                <span class="username">${recipe.CreatorUsername}</span>
-                                <span class="create-date">${new Date(recipe.CreatedAt).toLocaleDateString()}</span>
-                            </div>
-                            <h3 class="title">${recipe.Title}</h3>
-                            <p class="description">${recipe.Description}</p>
-                            <p class="category">Category: ${recipe.Category}</p>
-                            <img src="${recipe.ImageURL || 'default-image.jpg'}" alt="${recipe.Title}">
-                            <p class="rating">Rating: ${recipe.Rating}</p>
-                        `;
+                <div class="user-info">
+                    ${usernameHTML}
+                    <span class="create-date">${new Date(recipe.CreatedAt).toLocaleDateString()}</span>
+                </div>
+                <h3 class="title">${recipe.Title}</h3>
+                <p class="description">${recipe.Description}</p>
+                <p class="category">Category: ${recipe.Category}</p>
+                <img src="${recipe.ImageURL || 'default-image.jpg'}" alt="${recipe.Title}">
+                <p class="rating">Rating: ${recipe.Rating}</p>
+            `;
 
-                // Add ingredients and steps
+                // Add ingredients and steps sections
                 const ingredientsText = document.createElement('p');
                 ingredientsText.classList.add('expand-text');
                 ingredientsText.textContent = 'Ingredients';
-                ingredientsText.addEventListener('click', () => {
-                    ingredientsList.style.display = ingredientsList.style.display === 'none' ? 'block' : 'none';
-                });
-
                 const ingredientsList = document.createElement('div');
                 ingredientsList.classList.add('ingredients');
                 ingredientsList.innerHTML = `<ul>${recipe.Ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>`;
                 ingredientsList.style.display = 'none';
+                ingredientsText.addEventListener('click', () => {
+                    ingredientsList.style.display = ingredientsList.style.display === 'none' ? 'block' : 'none';
+                });
 
                 const stepsText = document.createElement('p');
                 stepsText.classList.add('expand-text');
                 stepsText.textContent = 'Steps';
-                stepsText.addEventListener('click', () => {
-                    stepsList.style.display = stepsList.style.display === 'none' ? 'block' : 'none';
-                });
-
                 const stepsList = document.createElement('div');
                 stepsList.classList.add('steps');
                 stepsList.innerHTML = `<ol>${recipe.Steps.map(step => `<li>${step}</li>`).join('')}</ol>`;
                 stepsList.style.display = 'none';
+                stepsText.addEventListener('click', () => {
+                    stepsList.style.display = stepsList.style.display === 'none' ? 'block' : 'none';
+                });
 
                 recipeCard.appendChild(ingredientsText);
                 recipeCard.appendChild(ingredientsList);
                 recipeCard.appendChild(stepsText);
                 recipeCard.appendChild(stepsList);
+
+                // Add Follow/Unfollow button
+                if (!isCurrentUser) {
+                    const followButton = document.createElement('button');
+                    const updateFollowButtonText = () => {
+                        const isFollowing = allFollowing.has(recipe.CreatorUserId);
+                        followButton.textContent = isFollowing
+                            ? 'Unfollow' + " " + recipe.CreatorUsername
+                            : 'Follow' + " " + recipe.CreatorUsername;
+                    };
+
+                    // Initialize the button text
+                    updateFollowButtonText();
+
+                    followButton.addEventListener('click', async () => {
+                        const isFollowing = allFollowing.has(recipe.CreatorUserId); // Recalculate each time
+                        try {
+                            const endpoint = isFollowing
+                                ? 'https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/unfollowUser'
+                                : 'https://0oo843p1e5.execute-api.us-east-1.amazonaws.com/prod/followUser';
+                            const method = isFollowing ? 'PUT' : 'POST';
+
+                            const response = await fetch(endpoint, {
+                                method,
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    body: JSON.stringify({
+                                        UserId: user.UserId,
+                                        TargetUserId: recipe.CreatorUserId,
+                                    }),
+                                }),
+                            });
+
+                            const result = await response.json();
+                            if (result.statusCode === 200) {
+                                const parsedBody = JSON.parse(result.body);
+                                if (parsedBody.message === 'Successfully unfollowed user.') {
+                                    alert(parsedBody.message);
+                                    allFollowing.delete(recipe.CreatorUserId);
+                                } else if (parsedBody.message === 'Successfully followed user.') {
+                                    alert(parsedBody.message);
+                                    allFollowing.add(recipe.CreatorUserId);
+                                } else {
+                                    alert('Unexpected response. Please try again.');
+                                }
+                                // Update the button text after success
+                                updateFollowButtonText();
+                            } else {
+                                alert('Failed to update follow status. Please try again.');
+                            }
+                        } catch (error) {
+                            console.error('Error updating follow status:', error);
+                            alert('Unable to update follow status. Please try again later.');
+                        }
+                    });
+
+                    recipeCard.appendChild(followButton);
+                }
 
                 // Add Save/Unsave button
                 const saveButton = document.createElement('button');
@@ -135,15 +244,17 @@
                 saveButton.addEventListener('click', () => handleSave(recipe.RecipeId, saveButton));
                 recipeCard.appendChild(saveButton);
 
-                // Reviews Button
+                // Add Reviews button
                 const reviewsButton = document.createElement('button');
                 reviewsButton.textContent = 'Reviews';
                 reviewsButton.addEventListener('click', () => handleReviews(recipe.RecipeId, recipeCard, reviewsButton));
                 recipeCard.appendChild(reviewsButton);
 
+                // Append the recipe card to the container
                 recipesContainer.appendChild(recipeCard);
             });
         };
+
 
         // Fetch all recipes
         const fetchRecipes = async () => {
@@ -283,16 +394,16 @@
 
                             // Create the review card
                             reviewCard.innerHTML = `
-        <p>____________________________________________________________________________________________________</p>
-        <br>
-        <div class="user-info">
-            ${usernameHTML}
-            <span class="create-date">${new Date(review.CreatedAt).toLocaleDateString()}</span>
-        </div>
-        <p class="description">${review.Description}</p>
-        <p class="rating">Rating: ${review.Rating}</p>
-        <img src="${review.ImageURL || 'default-image.jpg'}" alt="${review.Username}'s review">
-    `;
+            <p>____________________________________________________________________________________________________</p>
+            <br>
+            <div class="user-info">
+                ${usernameHTML}
+                <span class="create-date">${new Date(review.CreatedAt).toLocaleDateString()}</span>
+            </div>
+            <p class="description">${review.Description}</p>
+            <p class="rating">Rating: ${review.Rating}</p>
+            <img src="${review.ImageURL || 'default-image.jpg'}" alt="${review.Username}'s review">
+        `;
 
                             // If the current user is the reviewer, show a delete button
                             if (isCurrentUser) {

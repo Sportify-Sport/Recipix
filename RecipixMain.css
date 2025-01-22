@@ -111,7 +111,7 @@ header {
 
     .recipe-card img {
         width: 100%;
-        height: 150px;
+        height: 200px;
         object-fit: cover;
         border-radius: 5px;
     }
@@ -137,6 +137,7 @@ header {
 
     .recipe-card .username {
         font-weight: 500;
+        color:black;
     }
 
     .recipe-card .create-date {
@@ -175,18 +176,21 @@ header {
     }
 
     .recipe-card button {
+        font-size:20px;
+        font-weight:600;
         padding: 10px;
         border: none;
         border-radius: 5px;
-        background-color: black;
-        color: #fff;
+        background-color: transparent;
+        color: black;
         cursor: pointer;
         margin-top: 10px;
-        width: 100%;
+        width: 33%;
     }
 
         .recipe-card button:hover {
-            background-color: #45a049;
+            background-color: #cfcfcf;
+            transform: scale(1.05);
             transition: background-color 0.3s ease;
         }
 
@@ -209,6 +213,40 @@ header {
     .reviews-list .deleteReview:hover {
         background-color: red; /* Change to red on hover */
     }
+
+#sticky-buttons {
+    position: sticky;
+    top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+    #sticky-buttons button {
+        background-color: transparent;
+        color: black;
+        font-size: 16px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        #sticky-buttons button:hover {
+            background-color: #cfcfcf;
+            transform: scale(1.05);
+        }
+
+        #sticky-buttons button:active {
+            background-color: #003f88;
+        }
+
 
 footer {
     text-align: center;
