@@ -1,14 +1,16 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Recipix - Profile/Admin</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-        <!-- Add Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="ProfileAdmin.css" rel="stylesheet" />
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipix - Profile/Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add DataTables CSS -->
+    <link href="https://cdn.datatables.net/2.2.1/css/dataTables.bootstrap5.css" rel="stylesheet">
+    <link href="ProfileAdmin.css" rel="stylesheet" />
+</head>
 <body>
     <header>
         <div class="logo">Recipix</div>
@@ -47,20 +49,18 @@
                 <button type="submit" id="save-changes-button" disabled>Save Changes</button>
             </form>
         </section>
+
         <section class="saved-recipes">
             <h2>Saved Recipes</h2>
-            <div class="search-bar">
-                <input type="text" placeholder="Search for recipes...">
-                <select>
-                    <option>Sort by Rating</option>
-                    <option>Sort by Newest</option>
-                    <option>Sort by Popularity</option>
+            <div class="header">
+                <input type="text" id="search-bar" placeholder="Search recipes...">
+                <select id="sort-options">
+                    <option value="rating">Sort by Rating</option>
+                    <option value="newest">Sort by Newest</option>
                 </select>
             </div>
-            <div class="recipes-container">
-
-            </div>
         </section>
+        <div id="recipes-container"></div>
 
         <section class="uploaded-recipes">
             <h2>Your Uploaded Recipes</h2>
@@ -72,7 +72,8 @@
             <!-- Modal for adding a recipe -->
             <div id="recipe-modal" class="modal">
                 <div class="modal-content">
-                    <span class="close-modal">&times;</span> <!-- Close button (X) -->
+                    <span class="close-modal">&times;</span>
+                    Close button (X)
                     <h1>Post a Recipe</h1>
                     <form id="recipe-form">
                         <label for="title">Title:</label>
@@ -101,8 +102,8 @@
                         <label for="tags">Tags (comma-separated):</label>
                         <input type="text" id="tags" name="tags" required>
 
-                        <label for="creatorUserId">Creator User ID:</label>
-                        <input type="text" id="creatorUserId" name="creatorUserId" required>
+                        <label for="Image">URL Image:</label>
+                        <input type="text" id="urlImage" name="urlImage" required>
 
                         <button type="submit">Post Recipe</button>
                     </form>
@@ -110,26 +111,32 @@
             </div>
         </section>
 
-
         <section class="admin-panel">
             <h2>Admin Features</h2>
-            <div class="search-bar">
-                <input type="text" placeholder="Search for users or recipes...">
-                <select>
-                    <option>Sort by Username</option>
-                    <option>Sort by Activity</option>
-                    <option>Sort by Rating</option>
-                </select>
+            <div class="button-container">
+                <button id="fetch-users-button" class="btn btn-primary">Fetch All Users</button>
+                <button id="fetch-recipes-button" class="btn btn-primary">Fetch All Recipes</button>
             </div>
             <div class="admin-controls">
-                <!-- Bootstrap table will be inserted here -->
+                <!-- Table will be inserted here -->
             </div>
         </section>
 
-    <footer>
-        &copy; 2025 Recipix. All rights reserved.
-    </footer>
-    <script src="AdminPanel.js"></script>
+        <footer>
+            &copy; 2025 Recipix. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Add jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Add DataTables JS -->
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap5.js"></script>
+    <!-- Custom Scripts -->
+
     <script src="ProfileAdmin.js"></script>
+    <script src="AdminPanel.js"></script>
 </body>
 </html>

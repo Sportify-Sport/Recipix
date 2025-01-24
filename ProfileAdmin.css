@@ -6,13 +6,13 @@
     font-family: 'Roboto', sans-serif;
 }
 
-body {
+/*body {
     background-color: #f9f9f9;
     color: #333;
     margin: 20px;
     align-content: center;
     text-align: center;
-}
+}*/
 
 /* Header */
 header {
@@ -26,6 +26,7 @@ header {
     top: 0;
     width: 100%;
     z-index: 1000;
+    height: 50px;
 }
 
     header .logo {
@@ -158,43 +159,39 @@ h2 {
         background-color: #0056b3;
     }
 
-/* Admin Controls */
-.admin-controls {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 20px;
-}
-
-    .admin-controls .user-card,
-    .admin-controls .recipe-card {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        text-align: center;
+    .admin-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        width: 100%;
     }
-
-        .admin-controls .user-card p {
-            margin: 10px 0;
-            font-size: 1rem;
-        }
-
-    .admin-controls button {
+    
+    .admin-controls table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+    }
+    
+    .admin-controls th,
+    .admin-controls td {
         padding: 10px;
-        border: none;
-        border-radius: 5px;
-        background-color: black;
-        color: #fff;
-        cursor: pointer;
-        margin: 5px 0;
-        width: auto; /* Revert button width */
+        text-align: center;
+        border: 1px solid #ddd;
     }
-
-        .admin-controls button:hover {
-            background-color: #45a049;
-        }
+    
+    .admin-controls th {
+        background-color: #f8f9fa; /* Light gray background for headers */
+        font-weight: bold;
+    }
+    
+    .admin-controls tr:nth-child(even) {
+        background-color: #f9f9f9; /* Alternate row color */
+    }
+    
+    .admin-controls tr:hover {
+        background-color: #f1f1f1; /* Hover effect for rows */
+    }
 
 /* Footer */
 footer {
@@ -379,3 +376,226 @@ input[readonly] {
     color: #666;
     cursor: not-allowed;
 }
+ Ensure the modal is on top of everything 
+.modal {
+    z-index: 1050;  
+}
+
+ Ensure the modal backdrop covers the entire screen 
+.modal-backdrop {
+    z-index: 1040;  
+}
+
+
+.recipe-card .expand-text {
+    cursor: pointer;
+    color: #0066cc;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.recipe-card .ingredients,
+.recipe-card .steps {
+    display: none;
+    margin-top: 10px;
+}
+
+    .recipe-card .ingredients ul,
+    .recipe-card .steps ol {
+        padding-left: 20px;
+    }
+
+    .recipe-card .ingredients li,
+    .recipe-card .steps li {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+/*
+    //////////////////////////////////////////////////////////////////////////////*/
+
+
+
+/* General styles for the saved recipes section */
+.saved-recipes {
+    background-color: #fff;
+    width: 600px;
+    color: #000;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px; /* Set the container width to 600px */
+    margin: 0 auto; /* Center the container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    /* Title and header styles */
+    .saved-recipes h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: left; /* Align text to the left */
+    }
+
+    /* Styles for the header containing the search bar and sort options */
+    .saved-recipes .header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .saved-recipes #search-bar {
+        width: 70%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #000;
+    }
+
+    .saved-recipes #sort-options {
+        width: 28%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #000;
+    }
+
+/* Styles for the recipe card container */
+#recipes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+}
+
+/* Styles for each recipe card */
+.recipe-card {
+    width: 600px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    max-width: 600px; /* Limit width of the card */
+    margin: 0 auto; /* Center the recipe card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease; /* Add a transform transition */
+}
+
+    .recipe-card:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px); /* Slight lift effect on hover */
+    }
+
+    /* Recipe title */
+    .recipe-card .title {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #333;
+        margin: 10px 0;
+        text-align: left; /* Align text to the left */
+    }
+
+    /* Recipe creator username and creation date */
+    .recipe-card .user-info {
+        font-size: 0.9rem;
+        color: #777;
+        margin-bottom: 10px;
+        text-align: left; /* Align text to the left */
+    }
+
+        .recipe-card .user-info .username {
+            font-weight: bold;
+        }
+
+    /* Recipe description */
+    .recipe-card .description {
+        font-size: 1rem;
+        color: #444;
+        margin-bottom: 10px;
+        text-align: left; /* Align text to the left */
+    }
+
+    /* Recipe category and rating */
+    .recipe-card .category,
+    .recipe-card .rating {
+        font-size: 1rem;
+        color: #444;
+        margin-bottom: 10px;
+        text-align: left; /* Align text to the left */
+    }
+
+    .recipe-card .category {
+        font-weight: bold;
+    }
+
+    .recipe-card .rating {
+        font-weight: bold;
+    }
+
+    /* Recipe image */
+    .recipe-card img {
+        width: 100%;
+        max-height: 250px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    /* Ingredients and steps (expandable sections) */
+    .recipe-card .expand-text {
+        font-size: 1rem;
+        color: #007BFF;
+        cursor: pointer;
+        margin: 10px 0;
+        text-align: left; /* Align text to the left */
+    }
+
+    .recipe-card .ingredients,
+    .recipe-card .steps {
+        display: none;
+        font-size: 1rem;
+        color: #444;
+        text-align: left; /* Align text to the left */
+    }
+
+        .recipe-card .ingredients ul,
+        .recipe-card .steps ol {
+            padding-left: 20px;
+        }
+
+        .recipe-card .ingredients li,
+        .recipe-card .steps li {
+            margin-bottom: 5px;
+        }
+
+    /* Unsave button */
+    .recipe-card .unsave-btn {
+        background-color: #e74c3c;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 1rem;
+        margin-top: 15px; /* Add space above the unsave button */
+        width: 100%; /* Make the button span the full width of the card */
+    }
+
+        .recipe-card .unsave-btn:hover {
+            background-color: #c0392b;
+        }
+
+    /* Ingredients and steps section heading styles */
+    .recipe-card .ingredients h2,
+    .recipe-card .steps h2 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+        margin: 15px 0;
+        text-align: left; /* Align text to the left */
+    }
