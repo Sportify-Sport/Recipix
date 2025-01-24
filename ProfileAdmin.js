@@ -19,6 +19,12 @@
     const username = currentUser['cognito:username'];
     const email = currentUser['email'];
 
+    if (currentUser['cognito:groups'] && currentUser['cognito:groups'].includes("Admins")) {
+        document.querySelector('.toggle-button[data-section="admin-panel"]').style.display = 'block';
+    } else {
+        document.querySelector('.toggle-button[data-section="admin-panel"]').style.display = 'none';
+    }
+
     let userDetailsFromFetch = null; // Initialize as null
 
     async function fetchUserProfile(UserId) {
@@ -417,9 +423,6 @@
             }
         });
 
-
-
-
     const populateUploadedRecipes = async () => {
         const uploadedRecipesContainer = document.querySelector(".uploaded-recipes .recipes-container");
 
@@ -513,7 +516,11 @@
             deleteButtons.forEach(button => {
                 button.addEventListener("click", () => {
                     const recipeId = button.getAttribute("data-recipe-id");
-                    deleteRecipe(recipeId); // Delete the recipe
+                    const confirmDelete = confirm("Are you sure you want to delete this recipe? This action cannot be undone.");
+
+                    if (confirmDelete) {
+                        deleteRecipe(recipeId); // Delete the recipe
+                    }
                 });
             });
 
