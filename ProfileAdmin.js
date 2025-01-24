@@ -74,11 +74,21 @@
     const populateProfileDetails = (username, email, createdAt, bio) => {
         const profileDetails = document.querySelector(".profile-details");
         if (profileDetails) {
+            console.log("CreatedAt value:", createdAt); // Debugging: Log the createdAt value
+
+            // Validate createdAt
+            let createdAtt;
+            if (createdAt && !isNaN(new Date(createdAt).getTime())) {
+                createdAtt = new Date(createdAt).toISOString().split('T')[0];
+            } else {
+                console.warn("Invalid createdAt value. Using current date as fallback.");
+                createdAtt = new Date().toISOString().split('T')[0]; // Fallback to current date
+            }
+
             profileDetails.querySelector("#username").value = username;
             profileDetails.querySelector("#email").value = email;
-            const createdAtt = new Date(createdAt).toISOString().split('T')[0];
             profileDetails.querySelector("#created-at").value = createdAtt;
-            profileDetails.querySelector("#bio").value = userDetailsFromFetch.Bio;
+            profileDetails.querySelector("#bio").value = bio;
         }
     };
 
