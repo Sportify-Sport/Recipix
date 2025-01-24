@@ -599,3 +599,7 @@ input[readonly] {
         margin: 15px 0;
         text-align: left; /* Align text to the left */
     }
+
+.toggle-button[data-section="admin-panel"] {
+    display: none;
+}

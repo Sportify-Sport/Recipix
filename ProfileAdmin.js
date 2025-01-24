@@ -19,6 +19,12 @@
     const username = currentUser['cognito:username'];
     const email = currentUser['email'];
 
+    if (currentUser['cognito:groups'] && currentUser['cognito:groups'].includes("Admins")) {
+        document.querySelector('.toggle-button[data-section="admin-panel"]').style.display = 'block';
+    } else {
+        document.querySelector('.toggle-button[data-section="admin-panel"]').style.display = 'none';
+    }
+
     let userDetailsFromFetch = null; // Initialize as null
 
     async function fetchUserProfile(UserId) {
@@ -74,11 +80,21 @@
     const populateProfileDetails = (username, email, createdAt, bio) => {
         const profileDetails = document.querySelector(".profile-details");
         if (profileDetails) {
+            console.log("CreatedAt value:", createdAt); // Debugging: Log the createdAt value
+
+            // Validate createdAt
+            let createdAtt;
+            if (createdAt && !isNaN(new Date(createdAt).getTime())) {
+                createdAtt = new Date(createdAt).toISOString().split('T')[0];
+            } else {
+                console.warn("Invalid createdAt value. Using current date as fallback.");
+                createdAtt = new Date().toISOString().split('T')[0]; // Fallback to current date
+            }
+
             profileDetails.querySelector("#username").value = username;
             profileDetails.querySelector("#email").value = email;
-            const createdAtt = new Date(createdAt).toISOString().split('T')[0];
             profileDetails.querySelector("#created-at").value = createdAtt;
-            profileDetails.querySelector("#bio").value = userDetailsFromFetch.Bio;
+            profileDetails.querySelector("#bio").value = bio;
         }
     };
 
@@ -407,9 +423,6 @@
             }
         });
 
-
-
-
     const populateUploadedRecipes = async () => {
         const uploadedRecipesContainer = document.querySelector(".uploaded-recipes .recipes-container");
 
@@ -503,7 +516,11 @@
             deleteButtons.forEach(button => {
                 button.addEventListener("click", () => {
                     const recipeId = button.getAttribute("data-recipe-id");
-                    deleteRecipe(recipeId); // Delete the recipe
+                    const confirmDelete = confirm("Are you sure you want to delete this recipe? This action cannot be undone.");
+
+                    if (confirmDelete) {
+                        deleteRecipe(recipeId); // Delete the recipe
+                    }
                 });
             });
 
